@@ -26,7 +26,7 @@ SeattleHousingScrapper/
 ├── output/                    # Exported data (CSV/JSON)
 └── web/                       # Next.js frontend application
     ├── app/                   # Next.js App Router pages
-    ├── components/            # React components (Map, Filters, Cards, Modal)
+    ├── components/            # React components (Map, Filters, Cards, Panel)
     ├── lib/                   # Database queries (better-sqlite3)
     └── api/                   # REST API routes
 ```
@@ -245,7 +245,7 @@ python main.py qualify
 - Joins each building's AMI-by-bedroom data against the official rent & income schedules into `unit_qualifications`
 - MHA and IZ units follow the MILU schedule; the MFTE phase (P6/P7/MILU) is estimated from the exemption's 12-year term
 - Re-runs automatically after `affordable` and `rentlimits`
-- Shown in the web app's property modal as an "Affordable Unit Qualification" card
+- Shown in the web app's property panel as an "Affordable unit qualification" section
 
 ### Website Affordable-Housing Pages
 
@@ -316,7 +316,7 @@ npm run dev
 Open [http://localhost:0616](http://localhost:0616) to view the application.
 
 **Features:**
-- **Interactive Map** - Leaflet map with color-coded markers (amber: Mixed Market, violet: Fully Affordable)
+- **Interactive Map** - Leaflet map with color-coded markers (gold: Mixed Market, bluish green: Fully Affordable, sky blue: Market Rate), chosen to stay distinct with common color-vision deficiencies
 - **Filter Bar** - Search by text, neighborhood, program type, bedroom count, rent range
 - **Incentive Program Filter** - Narrow to MFTE (313), Incentive Zoning (49) or MHA (29)
   buildings, or to the properties in **none** of them. Note that statewide market-rate
@@ -327,17 +327,17 @@ Open [http://localhost:0616](http://localhost:0616) to view the application.
 - **City Filter** - 55 Washington cities; selecting one recentres the map on it.
   The neighborhood filter stays Seattle-only, since only that dataset has them
 - **Property Cards** - Show building info, AMI levels, unit types, live pricing badges
-- **Property Modal** - Detailed view with unit table, contact links, mini-map.
+- **Property Panel** - Detailed side panel with photos, the apartment list, contact links, mini-map.
   Each unit row deep-links to that exact apartment's listing page, while the
   website button goes to the property management landing page
-- **Favorites** - Heart an individual apartment in the unit table to save that
+- **Favorites** - Heart an individual apartment in the apartment list to save that
   specific listing; the card then shows a `♥ N` badge. Whole buildings can also be
   saved, which is the only option for the 28% of properties that publish no live
-  listings. The Favorites pill filters to buildings you saved or that hold a saved
+  listings. The Saved chip filters to buildings you saved or that hold a saved
   apartment. Stored per-browser in localStorage, since there are no accounts.
   Saved units are keyed by listing URL where available, not by row id — every
   crawl reissues those
-- **Share a list** - the share button next to the Favorites filter copies a link
+- **Share a list** - the Share list chip next to the Saved filter copies a link
   with the whole list encoded in the URL, so a recipient needs no account and
   nothing is stored server-side. The payload is deflated before base64url
   encoding, which matters because saved AppFolio units are identified by long,
@@ -355,7 +355,7 @@ Open [http://localhost:0616](http://localhost:0616) to view the application.
   the normalized key is the whole point — a key computed under old rules would
   go stale exactly as the id did. Links made before this shipped have no
   addresses and still fall back to id-only matching.
-- **View Modes** - Split view, list-only, or map-only
+- **List and Map views** - List pairs the results with a map; Map shows the map full width (phones switch with a floating List/Map button)
 - **Pagination** - 48 properties per page
 
 **Production build:**
@@ -447,7 +447,7 @@ The codebase is organized into 16 main communities:
 - **Main Page Layout** - Split-view with filters, cards, and map
 - **Map Component** - Leaflet integration with color-coded markers
 - **Property Card Component** - Listing cards with badges and pricing
-- **Property Modal Component** - Detail view with unit table
+- **Property Panel Component** - Detail side panel with the apartment list
 - **Filter Bar Component** - Search and filter controls
 
 ## Dependencies
