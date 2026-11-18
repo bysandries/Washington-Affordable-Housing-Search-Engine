@@ -1,139 +1,27 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
+import ThemeToggle from '@/components/ThemeToggle'
+import Wordmark from '@/components/Wordmark'
+import { Icon } from '@/lib/theme'
 
-/* ------------------------------------------------------------------ icons */
-
-function MicIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-      <path
-        fill="#4285f4"
-        d="M12 15c1.66 0 3-1.31 3-2.97V5.97C15 4.31 13.66 3 12 3S9 4.31 9 5.97v6.06C9 13.69 10.34 15 12 15z"
-      />
-      <path fill="#34a853" d="M11 18.08h2V21h-2z" />
-      <path
-        fill="#fbbc05"
-        d="M7.05 16.87c-1.27-1.33-2.05-3.1-2.05-4.87h2c0 1.45.56 2.77 1.47 3.76l-1.42 1.11z"
-      />
-      <path
-        fill="#ea4335"
-        d="M12 16.93a4.97 4.97 0 0 1-3.54-1.46l-1.41 1.4C8.32 18.14 10.07 19 12 19s3.68-.86 4.95-2.13l-1.41-1.4A4.97 4.97 0 0 1 12 16.93zM17 12h2c0 1.77-.78 3.54-2.05 4.87l-1.42-1.11A5.5 5.5 0 0 0 17 12z"
-      />
-    </svg>
-  )
-}
-
-function LensIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true">
-      <path d="M5 8V6a2 2 0 0 1 2-2h2" stroke="#4285f4" strokeWidth="2.4" strokeLinecap="round" />
-      <path d="M19 8V6a2 2 0 0 0-2-2h-2" stroke="#ea4335" strokeWidth="2.4" strokeLinecap="round" />
-      <path d="M5 16v2a2 2 0 0 0 2 2h2" stroke="#34a853" strokeWidth="2.4" strokeLinecap="round" />
-      <path d="M19 16v2a2 2 0 0 1-2 2h-2" stroke="#fbbc05" strokeWidth="2.4" strokeLinecap="round" />
-      <circle cx="12" cy="12" r="3.4" fill="#4285f4" />
-    </svg>
-  )
-}
-
-function SearchGlyph({ className = '' }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      width="22"
-      height="22"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      className={className}
-      aria-hidden="true"
-    >
-      <circle cx="11" cy="11" r="7" />
-      <line x1="16.5" y1="16.5" x2="21" y2="21" />
-    </svg>
-  )
-}
-
-function AppsGridIcon() {
-  const dots = []
-  for (const y of [4, 11, 18]) for (const x of [4, 11, 18]) dots.push([x, y])
-  return (
-    <svg viewBox="0 0 22 22" width="18" height="18" fill="currentColor" aria-hidden="true">
-      {dots.map(([x, y]) => (
-        <circle key={`${x}-${y}`} cx={x} cy={y} r="1.9" />
-      ))}
-    </svg>
-  )
-}
-
-/* ----------------------------------------------------------------- pieces */
-
-const LOGO_LETTERS = [
-  ['G', '#4285f4'],
-  ['o', '#ea4335'],
-  ['o', '#fbbc05'],
-  ['g', '#4285f4'],
-  ['l', '#34a853'],
-  ['e', '#ea4335'],
+/* The two views. The ids are shared with page.js and the view_changed event. */
+const VIEWS = [
+  { id: 'listings', label: 'List', icon: 'list' },
+  { id: 'map', label: 'Map', icon: 'map' },
 ]
 
-export function GoogleWordmark({ size = 'text-[26px]' }) {
-  return (
-    <span className={`font-display ${size} leading-none tracking-tight select-none whitespace-nowrap`}>
-      {LOGO_LETTERS.map(([ch, color], i) => (
-        <span key={i} style={{ color }}>
-          {ch}
-        </span>
-      ))}
-    </span>
-  )
-}
+const SEARCH_PLACEHOLDER = 'Search city, neighborhood, or address'
 
-function ThemeToggle() {
-  // Read the class the layout bootstrap script set; render a stable icon on
-  // the server pass and swap after mount so hydration never mismatches.
-  const [dark, setDark] = useState(null)
-  useEffect(() => {
-    setDark(document.documentElement.classList.contains('dark'))
-  }, [])
+/* ----------------------------------------------------------------- search */
 
-  const toggle = () => {
-    const next = !document.documentElement.classList.contains('dark')
-    document.documentElement.classList.toggle('dark', next)
-    try {
-      localStorage.setItem('theme', next ? 'dark' : 'light')
-    } catch {}
-    setDark(next)
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={toggle}
-      title={dark ? 'Switch to light theme' : 'Switch to dark theme'}
-      aria-label="Toggle theme"
-      className="w-10 h-10 flex items-center justify-center rounded-full text-gink-secondary dark:text-gink-dark-secondary hover:bg-gsurface-chip dark:hover:bg-gsurface-dark-chip transition-colors"
-    >
-      {dark ? (
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="4.5" />
-          <path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M19.4 4.6l-1.8 1.8M6.4 17.6l-1.8 1.8" />
-        </svg>
-      ) : (
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" />
-        </svg>
-      )}
-    </button>
-  )
-}
-
-function SearchBox({ value, onSearch }) {
-  // Debounced like the old FilterBar box: each applied keystroke refetches the
-  // list AND re-filters every map marker, so the draft keeps typing snappy.
+function SearchField({ value, onSearch, className = '' }) {
+  // A local draft keeps typing instant. Each applied query refetches the
+  // list and re-filters every map marker, so applying it is debounced.
   const [draft, setDraft] = useState(value)
   const timer = useRef(null)
+  const inputRef = useRef(null)
+  const id = useId()
 
   useEffect(() => {
     setDraft(value)
@@ -146,172 +34,181 @@ function SearchBox({ value, onSearch }) {
     timer.current = setTimeout(() => onSearch(v), 250)
   }
 
+  // Enter, or the Search key on a touch keyboard, applies the draft at once.
   const flush = () => {
     clearTimeout(timer.current)
     onSearch(draft)
   }
 
+  const clear = () => {
+    setDraft('')
+    clearTimeout(timer.current)
+    onSearch('')
+    // The clear button disappears with the text, so keep focus in the field
+    // instead of dropping it to the page.
+    inputRef.current?.focus()
+  }
+
   return (
-    <div className="flex items-center h-11 w-full rounded-full bg-white border border-gline shadow-none hover:shadow-pill focus-within:shadow-pill dark:bg-gsurface-dark-raised dark:border-transparent transition-shadow pl-5 pr-2">
+    <form
+      role="search"
+      onSubmit={(e) => {
+        e.preventDefault()
+        flush()
+        // On touch layouts, put the keyboard away so the results show.
+        if (window.matchMedia?.('(pointer: coarse)')?.matches) inputRef.current?.blur()
+      }}
+      // Height and placement come from the .site-header-search recipe.
+      className={`field neo-inset flex min-w-0 items-center gap-2 pl-3 pr-1 ${className}`}
+    >
+      {/* The magnifier is the field's label, so clicking it focuses the input. */}
+      <label htmlFor={id} className="flex shrink-0 cursor-text items-center text-muted">
+        <Icon name="search" size={18} />
+        <span className="sr-only">{SEARCH_PLACEHOLDER}</span>
+      </label>
       <input
-        type="text"
+        ref={inputRef}
+        id={id}
+        type="search"
         value={draft}
         onChange={(e) => setSearch(e.target.value)}
-        onKeyDown={(e) => e.key === 'Enter' && flush()}
-        placeholder='Try "rent in Seattle", a neighborhood, or an address…'
-        aria-label="Search rentals"
-        className="flex-1 min-w-0 bg-transparent text-base text-gink dark:text-gink-dark outline-none placeholder:text-gink-tertiary dark:placeholder:text-gink-dark-tertiary"
+        onKeyDown={(e) => {
+          // Esc empties a filled field, as platform search fields do, and
+          // stops there so the same press does not also close the details
+          // panel. With the field already empty, Esc passes through.
+          if (e.key === 'Escape' && draft) {
+            e.preventDefault()
+            e.stopPropagation()
+            clear()
+          }
+        }}
+        placeholder={SEARCH_PLACEHOLDER}
+        enterKeyHint="search"
+        autoComplete="off"
+        autoCorrect="off"
+        spellCheck={false}
+        className="field-input"
       />
       {draft && (
         <button
           type="button"
-          onClick={() => {
-            setDraft('')
-            clearTimeout(timer.current)
-            onSearch('')
-          }}
+          onClick={clear}
           aria-label="Clear search"
-          className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full text-gink-secondary dark:text-gink-dark-secondary hover:bg-gsurface-chip dark:hover:bg-gsurface-dark-chip"
+          className="btn-icon btn-icon-sm focus-ring-inset"
         >
-          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-            <path d="M6 6l12 12M18 6L6 18" />
-          </svg>
+          <Icon name="close" />
         </button>
       )}
-      <span className="hidden sm:block w-px h-6 mx-1 bg-gline dark:bg-gsurface-dark-chip shrink-0" aria-hidden="true" />
-      {/* Decorative on desktop only — phones need the room for typing */}
-      <span className="hidden sm:flex w-10 h-10 shrink-0 items-center justify-center" title="Voice search — decorative in this concept">
-        <MicIcon />
-      </span>
-      <span className="hidden sm:flex w-10 h-10 shrink-0 items-center justify-center" title="Search by image — decorative in this concept">
-        <LensIcon />
-      </span>
-      <button
-        type="button"
-        onClick={flush}
-        aria-label="Search"
-        className="w-10 h-10 shrink-0 flex items-center justify-center rounded-full text-google-blue hover:bg-gsurface-chip dark:hover:bg-gsurface-dark-chip"
-      >
-        <SearchGlyph />
-      </button>
+    </form>
+  )
+}
+
+/* ------------------------------------------------------------ view switch */
+
+function ViewSwitch({ view, onViewChange }) {
+  const refs = useRef([])
+  // Exactly one radio must stay in the tab order, whatever view is passed.
+  const current = VIEWS.some((v) => v.id === view) ? view : VIEWS[0].id
+
+  // Radio-group keyboard model: one tab stop; arrows (and Home / End) move
+  // to the next option and select it.
+  const onKeyDown = (e, i) => {
+    const last = VIEWS.length - 1
+    let next = -1
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = i === last ? 0 : i + 1
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = i === 0 ? last : i - 1
+    else if (e.key === 'Home') next = 0
+    else if (e.key === 'End') next = last
+    if (next < 0) return
+    e.preventDefault()
+    onViewChange(VIEWS[next].id)
+    refs.current[next]?.focus()
+  }
+
+  // Hidden on phones, where the floating pill in page.js switches views,
+  // except on short screens: there the pill would cover the strip or the
+  // results, so the switch stays in the header row instead.
+  return (
+    <div role="radiogroup" aria-label="View" className="segmented hidden sm:inline-flex short:inline-flex">
+      {VIEWS.map((v, i) => {
+        const checked = v.id === current
+        return (
+          <button
+            key={v.id}
+            ref={(el) => {
+              refs.current[i] = el
+            }}
+            type="button"
+            role="radio"
+            aria-checked={checked}
+            tabIndex={checked ? 0 : -1}
+            onClick={() => onViewChange(v.id)}
+            onKeyDown={(e) => onKeyDown(e, i)}
+            className="segmented-item"
+          >
+            {/* Shown only when the header has room (see .site-header). */}
+            <Icon name={v.icon} className="view-switch-icon" />
+            {v.label}
+          </button>
+        )
+      })}
     </div>
   )
 }
 
-/* ------------------------------------------------------------------- tabs */
-
-// Every tab works: "Listings" and "Maps" are this concept's own views, while
-// All / Images / News / Shopping embed the live google.com results for the
-// query. Only "AI Mode" stays inert (it cannot render embedded).
-const TABS = [
-  { id: 'ai', label: 'AI Mode', inert: true },
-  { id: 'all', label: 'All' },
-  { id: 'listings', label: 'Listings' },
-  { id: 'images', label: 'Images' },
-  { id: 'maps', label: 'Maps' },
-  { id: 'news', label: 'News' },
-  { id: 'shopping', label: 'Shopping' },
-]
+/* ----------------------------------------------------------------- header */
 
 export default function SearchHeader({
+  title, // the page's visually hidden h1
   search,
   onSearch,
   view, // 'listings' | 'map'
   onViewChange,
-  toolsOpen,
-  onToolsToggle,
-  activeFilterCount,
   onClearAll,
+  // Behind a full-screen sheet (page.js) the header is inert.
+  inert = false,
 }) {
-  const activeTab = view === 'map' ? 'maps' : view
-
-  const clickTab = (tab) => {
-    if (tab.inert) return
-    onViewChange(tab.id === 'maps' ? 'map' : tab.id)
+  // The wordmark starts a fresh search (filters cleared, list view) without
+  // a reload. Modified clicks still open a new tab or window as usual. Its
+  // name starts with the visible "WA HOUSING" so voice control can target it
+  // (WCAG 2.5.3, Label in Name) and then gives the full product name.
+  const goHome = (e) => {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+    e.preventDefault()
+    onClearAll()
+    onViewChange('listings')
   }
 
+  // sm and up, with room: one 48px row (wordmark, search, view switch,
+  // appearance). Phones, and wherever one row would squeeze the search field
+  // (large text sizes): wordmark and controls on the first row, then a
+  // full-width search field. The .site-header recipe in globals.css decides
+  // with a container query in rem. Below sm the view switch moves to the
+  // floating pill in page.js (except on short screens).
+  // The h1 sits here, in the banner, because the header is the one region
+  // the details panel never covers (what it covers is made inert).
   return (
-    <header className="shrink-0 z-20 bg-white dark:bg-gsurface-dark border-b border-gline dark:border-gline-dark">
-      {/* Logo + search + account. Below sm this wraps to two rows the way
-          Google's own mobile header does: logo + account on top, the search
-          pill full-width beneath. */}
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 sm:gap-x-4 px-4 sm:px-6 pt-3 sm:pt-4 pb-1">
+    <header
+      inert={inert ? '' : undefined}
+      className="app-bar site-header relative z-header shrink-0"
+    >
+      {title && <h1 className="sr-only">{title}</h1>}
+      <div className="site-header-row">
         <a
           href="/"
-          className="shrink-0 lg:w-[132px]"
-          aria-label="Google Listings concept home"
-          onClick={(e) => {
-            e.preventDefault()
-            onClearAll()
-            onViewChange('listings')
-          }}
+          onClick={goHome}
+          aria-label="WA Housing — Washington Affordable Housing Search, home"
+          className="relative -mx-1 my-1 flex h-10 shrink-0 items-center rounded-md px-1 before:absolute before:-inset-y-0.5 before:inset-x-0"
         >
-          <GoogleWordmark />
+          <Wordmark />
         </a>
-        <div className="order-last w-full sm:order-none sm:w-auto sm:flex-1 sm:max-w-[692px]">
-          <SearchBox value={search} onSearch={onSearch} />
-        </div>
-        <div className="ml-auto flex items-center gap-1 shrink-0">
+        <SearchField value={search} onSearch={onSearch} className="site-header-search" />
+        {/* May wrap onto two lines where the List | Map switch and the
+            toggle cannot share one (a short phone screen with large text). */}
+        <div className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-2">
+          <ViewSwitch view={view} onViewChange={onViewChange} />
           <ThemeToggle />
-          <button
-            type="button"
-            title="Google apps — decorative in this concept"
-            aria-label="Google apps"
-            className="hidden sm:flex w-10 h-10 items-center justify-center rounded-full text-gink-secondary dark:text-gink-dark-secondary hover:bg-gsurface-chip dark:hover:bg-gsurface-dark-chip transition-colors"
-          >
-            <AppsGridIcon />
-          </button>
-          <span
-            className="w-8 h-8 rounded-full bg-google-blue text-white text-sm font-display flex items-center justify-center select-none"
-            title="Signed in — decorative in this concept"
-          >
-            E
-          </span>
         </div>
-      </div>
-
-      {/* Tab strip */}
-      <div className="flex items-center px-4 sm:px-6 lg:pl-[172px]">
-        <nav className="flex items-center gap-1 overflow-x-auto no-scrollbar" aria-label="Search categories">
-          {TABS.map((tab) => {
-            const active = tab.id === activeTab
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => clickTab(tab)}
-                title={tab.inert ? 'Part of the concept chrome' : undefined}
-                aria-current={active ? 'page' : undefined}
-                className={`relative shrink-0 px-3 pt-1.5 pb-2.5 text-[13px] transition-colors ${
-                  active
-                    ? 'text-google-blue-ink dark:text-google-link-dark font-medium'
-                    : 'text-gink-secondary dark:text-gink-dark-tertiary hover:text-gink dark:hover:text-gink-dark'
-                } ${tab.inert ? 'cursor-default' : ''}`}
-              >
-                {tab.label}
-                {active && (
-                  <span className="absolute left-3 right-3 bottom-0 h-[3px] rounded-t-full bg-google-blue-ink dark:bg-google-link-dark" />
-                )}
-              </button>
-            )
-          })}
-        </nav>
-        <button
-          type="button"
-          onClick={onToolsToggle}
-          className={`ml-auto shrink-0 px-3 pt-1.5 pb-2.5 text-[13px] transition-colors flex items-center gap-1.5 ${
-            toolsOpen || activeFilterCount > 0
-              ? 'text-google-blue-ink dark:text-google-link-dark font-medium'
-              : 'text-gink-secondary dark:text-gink-dark-tertiary hover:text-gink dark:hover:text-gink-dark'
-          }`}
-        >
-          Tools
-          {activeFilterCount > 0 && (
-            <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full bg-[#e8f0fe] text-google-blue-deep dark:bg-[#1f3049] dark:text-google-link-dark">
-              {activeFilterCount}
-            </span>
-          )}
-        </button>
       </div>
     </header>
   )

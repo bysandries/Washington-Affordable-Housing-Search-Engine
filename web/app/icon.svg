@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" shape-rendering="crispEdges">
+  <title>WA Housing</title>
+  <rect width="32" height="32" rx="7" fill="#081c2b"/>
+  <!-- A 16x16 pixel house (each pixel is 2 units): stepped roof with a
+       chimney, walls with two windows and a door. -->
+  <path fill="#f4c430" fill-rule="evenodd" d="M14 6h4v2h2V6h2v6h2v2h2v2H6v-2h2v-2h2v-2h2V8h2zM8 16h16v10h-6v-6h-4v6H8zm2 2v2h2v-2zm10 0v2h2v-2z"/>
+</svg>

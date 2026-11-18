@@ -348,9 +348,20 @@ export function importShared({ properties = [], units = [], places = {} }) {
   return next
 }
 
-/** Heart toggle. Stops propagation so it works inside clickable rows and cards. */
-export function HeartButton({ active, onToggle, className = '', size = 'md', label = 'favorites' }) {
-  const px = size === 'sm' ? 'w-8 h-8 text-base' : 'w-10 h-10 text-lg'
+/**
+ * Heart toggle. Stops propagation so it works inside clickable rows and cards.
+ *
+ * A toggle button: the name stays "Save <label>" and aria-pressed carries the
+ * state. `label` names what is saved, so every heart on a page is distinct:
+ * "Save 101 Broadway, toggle button, pressed" or "Save apartment (1 Bed,
+ * 497 sqft, $2,150/mo)".
+ * 40px visual (32px for size="sm") with a 44px hit area: always for md, on
+ * touch layouts for sm. `relative z-10` lifts it above a card's stretched
+ * .card-link overlay. The icon is sized in rem, so it grows with the text.
+ */
+export function HeartButton({ active, onToggle, className = '', size = 'md', label = 'this place' }) {
+  const small = size === 'sm'
+  const iconSize = `${(small ? 18 : 20) / 16}rem`
   return (
     <button
       type="button"
@@ -360,16 +371,26 @@ export function HeartButton({ active, onToggle, className = '', size = 'md', lab
         onToggle()
       }}
       aria-pressed={active}
-      aria-label={active ? `Remove from ${label}` : `Save to ${label}`}
-      title={active ? `Remove from ${label}` : `Save to ${label}`}
-      // Material icon button: borderless, with a hover state circle.
-      className={`${px} shrink-0 flex items-center justify-center rounded-full transition-colors hover:bg-black/5 dark:hover:bg-white/10 ${
-        active
-          ? 'text-[#d93025] dark:text-[#f28b82]'
-          : 'text-gink-tertiary/70 hover:text-[#d93025] dark:text-gink-dark-tertiary dark:hover:text-[#f28b82]'
-      } ${className}`}
+      aria-label={`Save ${label}`}
+      className={`btn-icon ${
+        small ? 'btn-icon-sm' : 'before:absolute before:-inset-0.5'
+      } z-10 ${active ? 'text-saved hover:text-saved' : 'text-muted hover:text-saved'} ${className}`}
     >
-      {active ? '♥' : '♡'}
+      <svg
+        viewBox="0 0 24 24"
+        width={small ? 18 : 20}
+        height={small ? 18 : 20}
+        style={{ width: iconSize, height: iconSize }}
+        fill={active ? 'currentColor' : 'none'}
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.3 4.5 6.9 4.5c2.1 0 3.6 1.1 5.1 3 1.5-1.9 3-3 5.1-3 3.6 0 5.5 3.5 4.2 6.8-1.8 4.6-9.3 9.2-9.3 9.2z" />
+      </svg>
     </button>
   )
 }
