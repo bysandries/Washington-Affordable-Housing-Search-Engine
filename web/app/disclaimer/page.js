@@ -14,7 +14,7 @@ export default function DisclaimerPage() {
       current="/disclaimer"
       title="Legal Disclaimer"
       subtitle="An independent educational project, not an official source. Always confirm details with the property."
-      updated={{ iso: '2026-11-17', label: 'November 17, 2026' }}
+      updated={{ iso: '2026-11-18', label: 'November 18, 2026' }}
     >
       <div className="content-prose mt-8">
         <h2>For Educational & Research Purposes Only</h2>

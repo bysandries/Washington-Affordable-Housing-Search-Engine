@@ -14,7 +14,7 @@ export default function TermsPage() {
       current="/terms"
       title="Terms of Service"
       subtitle="This site is for education and research only. Verify every detail directly with the property."
-      updated={{ iso: '2026-11-17', label: 'November 17, 2026' }}
+      updated={{ iso: '2026-11-18', label: 'November 18, 2026' }}
     >
       <div className="content-prose mt-8">
         <p>
